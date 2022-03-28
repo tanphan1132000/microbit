@@ -17,8 +17,10 @@ function gas () {
     }
 }
 function IRsensor () {
-    if (isIRsensor == true) {
+    count_IR += 1
+    if (count_IR == 10 && isIRsensor == true) {
         serial.writeString("!16:INFRARED:" + ("" + pins.digitalReadPin(DigitalPin.P4)) + "#")
+        count_IR = 1
     }
 }
 serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
@@ -36,6 +38,7 @@ serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
 let temp = ""
 let gas_percent = 0
 let gas_raw = 0
+let count_IR = 0
 let count_gas = 0
 let count_DHT11 = 0
 let isIRsensor = false
@@ -43,7 +46,7 @@ led.enable(false)
 isIRsensor = true
 count_DHT11 = 1
 count_gas = 1
-let count_IR = 1
+count_IR = 1
 basic.forever(function () {
     DHT11()
     gas()
