@@ -2,8 +2,8 @@ function DHT11 () {
     count_DHT11 += 1
     if (count_DHT11 == 50) {
         NPNBitKit.DHT11Read(DigitalPin.P0)
-        serial.writeString("!7:TEMP:" + NPNBitKit.DHT11Temp() + "#")
-        serial.writeString("!7:HUMI:" + NPNBitKit.DHT11Hum() + "#")
+        serial.writeString("!7:TEMP:" + ("" + NPNBitKit.DHT11Temp()) + "#")
+        serial.writeString("!7:HUMI:" + ("" + NPNBitKit.DHT11Hum()) + "#")
         count_DHT11 = 1
     }
 }
@@ -12,13 +12,13 @@ function gas () {
     if (count_gas == 30) {
         gas_raw = pins.analogReadPin(AnalogPin.P2)
         gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
-        serial.writeString("!23:GAS:" + gas_percent + "#")
+        serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
         count_gas = 1
     }
 }
 function IRsensor () {
     if (isIRsensor == true) {
-        serial.writeString("!16:INFRARED:" + pins.digitalReadPin(DigitalPin.P4) + "#")
+        serial.writeString("!16:INFRARED:" + ("" + pins.digitalReadPin(DigitalPin.P4)) + "#")
     }
 }
 serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
