@@ -10,7 +10,7 @@ function DHT11 () {
 function gas () {
     count_gas += 1
     if (count_gas == 30) {
-        gas_raw = pins.analogReadPin(AnalogPin.P2)
+        gas_raw = pins.analogReadPin(AnalogPin.P10)
         gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
         serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
         count_gas = 1
