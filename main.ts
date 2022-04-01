@@ -2,25 +2,43 @@ function DHT11 () {
     count_DHT11 += 1
     if (count_DHT11 == 50) {
         NPNBitKit.DHT11Read(DigitalPin.P0)
-        serial.writeString("!7:TEMP:" + ("" + NPNBitKit.DHT11Temp()) + "#")
-        serial.writeString("!7:HUMI:" + ("" + NPNBitKit.DHT11Hum()) + "#")
+        temp_state[1] = NPNBitKit.DHT11Temp()
+        humi_state[1] = NPNBitKit.DHT11Hum()
+        if (temp_state[1] != temp_state[0]) {
+            serial.writeString("!7:TEMP:" + ("" + NPNBitKit.DHT11Temp()) + "#")
+            temp_state[0] = NPNBitKit.DHT11Temp()
+        }
+        if (humi_state[1] != humi_state[0]) {
+            serial.writeString("!7:HUMI:" + ("" + NPNBitKit.DHT11Hum()) + "#")
+            humi_state[0] = NPNBitKit.DHT11Hum()
+        }
         count_DHT11 = 1
-    }
-}
-function gas () {
-    count_gas += 1
-    if (count_gas == 30) {
-        gas_raw = pins.analogReadPin(AnalogPin.P10)
-        gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
-        serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
-        count_gas = 1
     }
 }
 function IRsensor () {
     count_IR += 1
     if (count_IR == 10 && isIRsensor == true) {
-        serial.writeString("!16:INFRARED:" + ("" + pins.digitalReadPin(DigitalPin.P4)) + "#")
+        IRValue = pins.digitalReadPin(DigitalPin.P4)
+        ir_state[1] = IRValue
+        if (ir_state[1] != ir_state[0]) {
+            let list: number[] = []
+            serial.writeString("!16:INFRARED:" + ("" + IRValue) + "#")
+            list[0] = IRValue
+        }
         count_IR = 1
+    }
+}
+function Gas () {
+    count_gas += 1
+    if (count_gas == 30) {
+        gas_raw = pins.analogReadPin(AnalogPin.P10)
+        gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
+        gas_state[1] = gas_percent
+        if (gas_state[1] != gas_state[0]) {
+            serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
+            gas_state[0] = gas_percent
+        }
+        count_gas = 1
     }
 }
 serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
@@ -38,6 +56,11 @@ serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
 let temp = ""
 let gas_percent = 0
 let gas_raw = 0
+let IRValue = 0
+let ir_state: number[] = []
+let gas_state: number[] = []
+let humi_state: number[] = []
+let temp_state: number[] = []
 let count_IR = 0
 let count_gas = 0
 let count_DHT11 = 0
@@ -47,9 +70,13 @@ isIRsensor = true
 count_DHT11 = 1
 count_gas = 1
 count_IR = 1
+temp_state = [0, 0]
+humi_state = [0, 0]
+gas_state = [0, 0]
+ir_state = [0, 0]
 basic.forever(function () {
     DHT11()
-    gas()
+    Gas()
     IRsensor()
     basic.pause(100)
 })
