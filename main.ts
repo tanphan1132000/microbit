@@ -17,7 +17,7 @@ function DHT11 () {
 }
 function IRsensor () {
     count_IR += 1
-    if (count_IR == 5 && isIRsensor == true) {
+    if (count_IR == 10 && isIRsensor == true) {
         IRValue = pins.analogReadPin(AnalogPin.P4)
         if (IRValue <= 800) {
             ir_state[1] = parseFloat("1")
@@ -51,8 +51,10 @@ serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
     } else if (temp == "IR:ON") {
         isIRsensor = true
     } else if (temp == "LIGHT:ON") {
+        pins.digitalWritePin(DigitalPin.P5, 1)
         pins.digitalWritePin(DigitalPin.P6, 1)
     } else if (temp == "LIGHT:OFF") {
+        pins.digitalWritePin(DigitalPin.P5, 0)
         pins.digitalWritePin(DigitalPin.P6, 0)
     }
 })
