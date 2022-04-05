@@ -19,11 +19,14 @@ function IRsensor () {
     count_IR += 1
     if (count_IR == 10 && isIRsensor == true) {
         IRValue = pins.analogReadPin(AnalogPin.P4)
-        ir_state[1] = IRValue
+        if (IRValue <= 800) {
+            ir_state[1] = parseFloat("1")
+        } else {
+            ir_state[1] = parseFloat("0")
+        }
         if (ir_state[1] != ir_state[0]) {
-            let list: number[] = []
-            serial.writeString("!16:INFRARED:" + ("" + IRValue) + "#")
-            list[0] = IRValue
+            serial.writeString("!16:INFRARED:" + ("" + ir_state[1]) + "#")
+            ir_state[0] = ir_state[1]
         }
         count_IR = 1
     }
