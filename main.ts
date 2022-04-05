@@ -18,7 +18,7 @@ function DHT11 () {
 function IRsensor () {
     count_IR += 1
     if (count_IR == 10 && isIRsensor == true) {
-        IRValue = pins.digitalReadPin(DigitalPin.P4)
+        IRValue = pins.analogReadPin(AnalogPin.P4)
         ir_state[1] = IRValue
         if (ir_state[1] != ir_state[0]) {
             let list: number[] = []
