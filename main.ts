@@ -16,19 +16,15 @@ function DHT11 () {
     }
 }
 function IRsensor () {
-    count_IR += 1
-    if (count_IR == 10 && isIRsensor == true) {
-        IRValue = pins.analogReadPin(AnalogPin.P4)
-        if (IRValue <= 800) {
-            ir_state[1] = parseFloat("1")
-        } else {
-            ir_state[1] = parseFloat("0")
-        }
-        if (ir_state[1] != ir_state[0]) {
-            serial.writeString("!16:INFRARED:" + ("" + ir_state[1]) + "#")
-            ir_state[0] = ir_state[1]
-        }
-        count_IR = 1
+    IRValue = pins.analogReadPin(AnalogPin.P4)
+    if (IRValue <= 800) {
+        ir_state[1] = parseFloat("1")
+    } else {
+        ir_state[1] = parseFloat("0")
+    }
+    if (ir_state[1] != ir_state[0]) {
+        serial.writeString("!16:INFRARED:" + ("" + ir_state[1]) + "#")
+        ir_state[0] = ir_state[1]
     }
 }
 function Gas () {
@@ -64,7 +60,6 @@ let ir_state: number[] = []
 let gas_state: number[] = []
 let humi_state: number[] = []
 let temp_state: number[] = []
-let count_IR = 0
 let count_gas = 0
 let count_DHT11 = 0
 let isIRsensor = false
@@ -72,7 +67,7 @@ led.enable(false)
 isIRsensor = true
 count_DHT11 = 1
 count_gas = 1
-count_IR = 1
+let count_IR = 1
 temp_state = [0, 0]
 humi_state = [0, 0]
 gas_state = [0, 0]
