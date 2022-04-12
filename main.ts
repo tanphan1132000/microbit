@@ -1,23 +1,16 @@
 function DHT11 () {
     count_DHT11 += 1
-    if (count_DHT11 == 50) {
+    if (count_DHT11 == 200) {
         NPNBitKit.DHT11Read(DigitalPin.P0)
-        temp_state[1] = NPNBitKit.DHT11Temp()
-        humi_state[1] = NPNBitKit.DHT11Hum()
-        if (temp_state[1] != temp_state[0]) {
-            serial.writeString("!7:TEMP:" + ("" + NPNBitKit.DHT11Temp()) + "#")
-            temp_state[0] = NPNBitKit.DHT11Temp()
-        }
-        if (humi_state[1] != humi_state[0]) {
-            serial.writeString("!7:HUMI:" + ("" + NPNBitKit.DHT11Hum()) + "#")
-            humi_state[0] = NPNBitKit.DHT11Hum()
-        }
+        Temp_value = NPNBitKit.DHT11Temp()
+        Humi_value = NPNBitKit.DHT11Hum()
+        serial.writeString("!7:TEMP:" + ("" + Temp_value) + "#" + "!7:HUMI:" + ("" + Humi_value) + "#")
         count_DHT11 = 1
     }
 }
 function IRsensor () {
     count_IR += 1
-    if (count_IR == 11 && isIRsensor == true) {
+    if (count_IR == 14 && isIRsensor == 1) {
         IRValue = pins.analogReadPin(AnalogPin.P4)
         if (IRValue <= 800) {
             ir_state[1] = parseFloat("1")
@@ -32,58 +25,55 @@ function IRsensor () {
     }
 }
 function Gas () {
-    count_gas += 1
-    if (count_gas == 30) {
+    count_GAS += 1
+    if (count_GAS == 150) {
         gas_raw = pins.analogReadPin(AnalogPin.P10)
         gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
-        gas_state[1] = gas_percent
-        if (gas_state[1] != gas_state[0]) {
-            serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
-            gas_state[0] = gas_percent
-        }
-        count_gas = 1
+        serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
+        count_GAS = 1
     }
 }
 serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
-    temp = serial.readUntil(serial.delimiters(Delimiters.Hash))
-    NPNLCD.ShowString(temp, 0, 0)
-    if (temp == "IR:OFF") {
-        isIRsensor = false
-    } else if (temp == "IR:ON") {
-        isIRsensor = true
-    } else if (temp == "LIGHT:ON") {
+    temporary = serial.readUntil(serial.delimiters(Delimiters.Hash))
+    NPNLCD.clear()
+    NPNLCD.ShowString(temporary, 0, 0)
+    if (temporary == "IR:OFF") {
+        isIRsensor = 0
+    } else if (temporary == "IR:ON") {
+        isIRsensor = 1
+        count_IR = 1
+    } else if (temporary == "LIGHT:ON") {
         pins.digitalWritePin(DigitalPin.P5, 1)
         pins.digitalWritePin(DigitalPin.P6, 1)
-    } else if (temp == "LIGHT:OFF") {
+    } else if (temporary == "LIGHT:OFF") {
         pins.digitalWritePin(DigitalPin.P5, 0)
         pins.digitalWritePin(DigitalPin.P6, 0)
     }
 })
-let temp = ""
+let temporary = ""
 let gas_percent = 0
 let gas_raw = 0
 let IRValue = 0
+let Humi_value = 0
+let Temp_value = 0
 let ir_state: number[] = []
-let gas_state: number[] = []
-let humi_state: number[] = []
-let temp_state: number[] = []
 let count_IR = 0
-let count_gas = 0
+let count_GAS = 0
 let count_DHT11 = 0
-let isIRsensor = false
+let isIRsensor = 0
 led.enable(false)
 NPNLCD.LcdInit()
-isIRsensor = true
+pins.digitalWritePin(DigitalPin.P5, 0)
+pins.digitalWritePin(DigitalPin.P6, 0)
+isIRsensor = 1
 count_DHT11 = 1
-count_gas = 1
+count_GAS = 1
 count_IR = 1
-temp_state = [0, 0]
-humi_state = [0, 0]
-gas_state = [0, 0]
 ir_state = [0, 0]
+NPNLCD.ShowString("Xin Chao", 0, 0)
 basic.forever(function () {
+    IRsensor()
     DHT11()
     Gas()
-    IRsensor()
     basic.pause(100)
 })
