@@ -17,7 +17,7 @@ function DHT11 () {
 }
 function IRsensor () {
     count_IR += 1
-    if (count_IR == 10 && isIRsensor == true) {
+    if (count_IR == 11 && isIRsensor == true) {
         IRValue = pins.analogReadPin(AnalogPin.P4)
         if (IRValue <= 800) {
             ir_state[1] = parseFloat("1")
@@ -46,6 +46,7 @@ function Gas () {
 }
 serial.onDataReceived(serial.delimiters(Delimiters.Hash), function () {
     temp = serial.readUntil(serial.delimiters(Delimiters.Hash))
+    NPNLCD.ShowString(temp, 0, 0)
     if (temp == "IR:OFF") {
         isIRsensor = false
     } else if (temp == "IR:ON") {
@@ -71,6 +72,7 @@ let count_gas = 0
 let count_DHT11 = 0
 let isIRsensor = false
 led.enable(false)
+NPNLCD.LcdInit()
 isIRsensor = true
 count_DHT11 = 1
 count_gas = 1
