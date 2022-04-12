@@ -1,6 +1,6 @@
 function DHT11 () {
     count_DHT11 += 1
-    if (count_DHT11 == 200) {
+    if (count_DHT11 == 250) {
         NPNBitKit.DHT11Read(DigitalPin.P0)
         Temp_value = NPNBitKit.DHT11Temp()
         Humi_value = NPNBitKit.DHT11Hum()
@@ -10,7 +10,7 @@ function DHT11 () {
 }
 function IRsensor () {
     count_IR += 1
-    if (count_IR == 14 && isIRsensor == 1) {
+    if (count_IR == 11 && isIRsensor == 1) {
         IRValue = pins.analogReadPin(AnalogPin.P4)
         if (IRValue <= 800) {
             ir_state[1] = parseFloat("1")
@@ -26,10 +26,10 @@ function IRsensor () {
 }
 function Gas () {
     count_GAS += 1
-    if (count_GAS == 150) {
+    if (count_GAS == 200) {
         gas_raw = pins.analogReadPin(AnalogPin.P10)
         gas_percent = Math.map(gas_raw, 0, 1023, 0, 100)
-        serial.writeString("!23:GAS:" + ("" + gas_percent) + "#")
+        serial.writeString("!23:GAS:" + Math.ceil(gas_percent) + "#")
         count_GAS = 1
     }
 }
@@ -73,7 +73,7 @@ ir_state = [0, 0]
 NPNLCD.ShowString("Xin Chao", 0, 0)
 basic.forever(function () {
     IRsensor()
-    DHT11()
     Gas()
+    DHT11()
     basic.pause(100)
 })
